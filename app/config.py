@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -16,6 +17,32 @@ class Config:
     # 設定靜態資源路徑
     RESOURCE_PATH = os.environ.get("RESOURCE_PATH", "static")
 
-    # 設定 SSL 憑證路徑
-    ssl_keyfile = os.path.join("certs", "key.pem")
-    ssl_certfile = os.path.join("certs", "cert.pem")
+    # 設定 SSL 憑證路徑 - 轉換為絕對路徑
+    _ssl_keyfile_env = os.environ.get("SSL_KEYFILE")
+    _ssl_certfile_env = os.environ.get("SSL_CERTFILE")
+    
+    # 如果是相對路徑，則相對於專案根目錄
+    SSL_KEYFILE: Path | None = None
+    SSL_CERTFILE: Path | None = None
+    
+    if _ssl_keyfile_env:
+        if os.path.isabs(_ssl_keyfile_env):
+            SSL_KEYFILE = Path(_ssl_keyfile_env)
+        else:
+            # 相對路徑，相對於專案根目錄
+            project_root = Path(__file__).parent.parent
+            SSL_KEYFILE = project_root / _ssl_keyfile_env
+    
+    if _ssl_certfile_env:
+        if os.path.isabs(_ssl_certfile_env):
+            SSL_CERTFILE = Path(_ssl_certfile_env)
+        else:
+            # 相對路徑，相對於專案根目錄
+            project_root = Path(__file__).parent.parent
+            SSL_CERTFILE = project_root / _ssl_certfile_env
+
+    # 檢查 SSL 檔案是否存在
+    HAS_SSL: bool = bool(
+        SSL_KEYFILE and SSL_CERTFILE and 
+        SSL_KEYFILE.is_file() and SSL_CERTFILE.is_file()
+    )

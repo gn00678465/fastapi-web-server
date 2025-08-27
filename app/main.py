@@ -1,7 +1,6 @@
 import os
 import httpx
 from pathlib import Path
-from contextlib import asynccontextmanager
 
 import uvicorn
 from fastapi import FastAPI, Request, HTTPException
@@ -15,35 +14,8 @@ from app.utils.static_dirs import setup_static_dirs
 # 載入環境變數
 load_dotenv()
 
-# service: PlaywrightService | None = None
-
-async def startup_event():
-    """Event handler for application startup to initialize the browser."""
-    global service
-    # service = await PlaywrightService.create()
-    # logger.info("Starting browser with Engine: %s", ENGINE)
-    # await service.start_browser(engine=ENGINE)
-
-
-async def shutdown_event():
-    """Event handler for application shutdown to close the browser."""
-    global service
-    if service:
-        await service.stop()
-        service = None
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Load browser and Playwright context
-    await startup_event()
-    yield
-    # Clean up the browser and Playwright context
-    await shutdown_event()
-
-
 app = FastAPI(
-    title="Web server",
-    lifespan=lifespan
+    title="Web server"
 )
 
 # 設定 CORS 中介軟體
@@ -184,10 +156,15 @@ async def health_check():
 # 掛載靜態資源（注意路徑配置）
 if os.path.exists(Config.RESOURCE_PATH):
     setup_static_dirs(app, Config.BASE_URL, Config.RESOURCE_PATH)
-
-if __name__ == "__main__":
+    
+def run_server():
     uvicorn.run(
         app,
         host=Config.HOST,
         port=Config.PORT,
+        ssl_keyfile=str(Config.SSL_KEYFILE) if Config.HAS_SSL else None,
+        ssl_certfile=str(Config.SSL_CERTFILE) if Config.HAS_SSL else None
     )
+
+if __name__ == "__main__":
+    run_server()
