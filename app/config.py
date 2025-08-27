@@ -19,8 +19,6 @@ class Config:
     # 設定靜態資源路徑
     RESOURCE_DIR = os.environ.get("RESOURCE_DIR", "static")
     RESOURCE_SUB_DIRS: list[str] = os.environ.get("RESOURCE_SUB_DIRS", [])
-    
-    print(f"RESOURCE_SUB_DIRS: {RESOURCE_SUB_DIRS}")
 
     # 設定 SSL 憑證路徑 - 轉換為絕對路徑
     _ssl_keyfile_env = os.environ.get("SSL_KEYFILE")
