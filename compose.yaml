@@ -1,0 +1,15 @@
+services:
+  web-app:
+    build: .
+    container_name: web-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./static:/app/static
+    environment:
+      - BASE_URL=/
+      - TARGET_URL=
+      - PORT=3000
+      - RESOURCE_DIR=static
+      - RESOURCE_SUB_DIRS=[]
+    network_mode: bridge

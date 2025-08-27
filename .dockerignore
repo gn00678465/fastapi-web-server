@@ -1,0 +1,33 @@
+# 排除靜態資源目錄 (將使用 volume 掛載)
+static/
+static/**
+
+# 排除憑證目錄 (將使用 volume 掛載)
+certs/
+certs/**
+
+# 排除 Python 快取檔案
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# 排除開發和編輯器相關檔案
+.env
+.venv
+env/
+venv/
+ENV/
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 排除版本控制相關檔案
+.git/
+.gitignore
+
+# 排除其他不必要的檔案
+*.log
+.DS_Store
