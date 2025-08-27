@@ -1,7 +1,7 @@
 [project]
-name = "web-server"
+name = "fastapi-web-server"
 version = "0.1.0"
-description = "Add your description here"
+description = "一個基於 FastAPI 的 Web 伺服器專案，主要功能包括 API 代理、靜態檔案服務和前端路由支援。"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

@@ -1,3 +1,4 @@
+""" 應用程式設定 """
 import os
 from pathlib import Path
 from dotenv import load_dotenv
@@ -5,6 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
+    """應用程式設定類別"""
     HOST: str = os.environ.get("HOST", "0.0.0.0")
     PORT: int = int(os.environ.get("PORT", "8000"))
     BASE_URL: str = os.environ.get("BASE_URL", "/")
@@ -15,7 +17,10 @@ class Config:
         raise ValueError("TARGET_URL environment variable is not set")
 
     # 設定靜態資源路徑
-    RESOURCE_PATH = os.environ.get("RESOURCE_PATH", "static")
+    RESOURCE_DIR = os.environ.get("RESOURCE_DIR", "static")
+    RESOURCE_SUB_DIRS: list[str] = os.environ.get("RESOURCE_SUB_DIRS", [])
+    
+    print(f"RESOURCE_SUB_DIRS: {RESOURCE_SUB_DIRS}")
 
     # 設定 SSL 憑證路徑 - 轉換為絕對路徑
     _ssl_keyfile_env = os.environ.get("SSL_KEYFILE")

@@ -1,6 +1,7 @@
+""" 主應用程式入口 """
 import os
-import httpx
 from pathlib import Path
+import httpx
 
 import uvicorn
 from fastapi import FastAPI, Request, HTTPException
@@ -31,10 +32,8 @@ app.add_middleware(
 @app.get("/")
 async def redirect_to_base_url():
     """根路徑重定向到環境變數的 BASE_URL"""
-    if not Config.BASE_URL == '/':
+    if Config.BASE_URL != '/':
         return RedirectResponse(Config.BASE_URL)
-    else:
-        pass
 
 @app.api_route(f"{Config.BASE_URL}/api/{{path:path}}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"])
 async def api_proxy(path: str, request: Request):
@@ -77,46 +76,45 @@ async def api_proxy(path: str, request: Request):
         # # 輸出回應資訊
         # print(f"API 回應: 狀態碼={response.status_code}, 內容類型={response.headers.get('content-type')}")
         # print(f"回應標頭: {response.headers}")
-        
+
         # 構建回應並返回
         resp = Response(
             content=response.content,
             status_code=response.status_code,
             headers=dict(response.headers),
         )
-        
+
         # 確保回應不會被快取
         resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
         return resp
-        
+
     except Exception as e:
         print(f"API proxy error: {str(e)}")
         raise HTTPException(status_code=500, detail=f"API proxy error: {str(e)}")
-    
 
 @app.get(f"{Config.BASE_URL}")
 async def read_index():
     """
     處理首頁
     """
-    index_path = Path(Config.RESOURCE_PATH) / "index.html"
+    index_path = Path(Config.RESOURCE_DIR) / "index.html"
     if index_path.is_file():
         return FileResponse(index_path)
-    else:
-         # 若 index.html 不存在，建立一個簡單的預設頁面
-        return Response(
-            content="""
-            <html>
-            <head><title>Web Server</title></head>
-            <body>
-                <h1>Welcome to Web Server</h1>
-                <p>Static resources are available at <a href="/static/">/static/</a></p>
-                <p>Available static files structure:</p>
-            </body>
-            </html>
-            """,
-            media_type="text/html"
-        )
+
+        # 若 index.html 不存在，建立一個簡單的預設頁面
+    return Response(
+        content="""
+        <html>
+        <head><title>Web Server</title></head>
+        <body>
+            <h1>Welcome to Web Server</h1>
+            <p>Static resources are available at <a href="/static/">/static/</a></p>
+            <p>Available static files structure:</p>
+        </body>
+        </html>
+        """,
+        media_type="text/html"
+    )
 
 # 處理其他前端路由
 @app.get(f"{Config.BASE_URL}/{{path:path}}")
@@ -130,12 +128,12 @@ async def catch_all(path: str, request: Request):
         raise HTTPException(status_code=404, detail="API endpoint does not exist")
 
     # 檢查是否為靜態檔案
-    file_path = Path(Config.RESOURCE_PATH) / path
+    file_path = Path(Config.RESOURCE_DIR) / path
     if file_path.is_file():
         return FileResponse(file_path)
 
     # 返回 index.html 以支援前端路由
-    index_path = Path(Config.RESOURCE_PATH) / "index.html"
+    index_path = Path(Config.RESOURCE_DIR) / "index.html"
     if index_path.is_file():
         return FileResponse(index_path)
 
@@ -154,10 +152,16 @@ async def health_check():
     return {"status": "healthy", "message": "API 運作正常"}
 
 # 掛載靜態資源（注意路徑配置）
-if os.path.exists(Config.RESOURCE_PATH):
-    setup_static_dirs(app, Config.BASE_URL, Config.RESOURCE_PATH)
-    
+if os.path.exists(Config.RESOURCE_DIR):
+    setup_static_dirs(
+        app,
+        Config.BASE_URL,
+        Config.RESOURCE_DIR,
+        Config.RESOURCE_SUB_DIRS
+    )
+
 def run_server():
+    """ 啟動 Uvicorn 伺服器"""
     uvicorn.run(
         app,
         host=Config.HOST,
