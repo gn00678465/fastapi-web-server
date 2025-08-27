@@ -33,9 +33,6 @@ web-server/
 │   └── utils/             # 工具函數
 │       └── static_dirs.py # 靜態檔案掛載邏輯
 ├── static/                # 靜態資源
-│   ├── index.html         # 主頁面
-│   ├── _nuxt/            # Nuxt.js 建置檔案
-│   └── _fonts/           # 字體檔案
 ├── certs/                 # SSL 憑證
 │   ├── cert.pem
 │   └── key.pem
