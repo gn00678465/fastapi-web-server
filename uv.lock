@@ -790,12 +790,14 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "fastapi", extra = ["standard"] },
+    { name = "playwright" },
     { name = "pytest-playwright" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.116.1" },
+    { name = "playwright", specifier = ">=1.54.0" },
     { name = "pytest-playwright", specifier = ">=0.7.0" },
 ]
 
